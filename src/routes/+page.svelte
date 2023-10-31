@@ -1,8 +1,7 @@
 <script>
-	import { invalidateAll } from '$app/navigation';
 	import AddTodo from '$lib/components/AddTodo.svelte';
 	import Todo from '$lib/components/Todo.svelte';
-	import { supabase } from '$lib/supabaseClient';
+	import List from '$lib/components/List.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -26,28 +25,25 @@
 	 */
 
 	// @ts-ignore
-	const { todo } = data;
-	const { list } = data;
+	$: todo = data.todo;
+	$: list = data.list;
 
 	let isAddTodoOpen = false;
 
 	function openAddTodo() {
 		isAddTodoOpen = !isAddTodoOpen;
 	}
-
-	const toDo = supabase
-		.channel('todo')
-		.on('postgres_changes', { event: '*', schema: 'public', table: 'toDo' }, (payload) => {
-			console.log('Change received!', payload);
-		})
-		.subscribe();
 </script>
 
-<div class="border">
-	<div class="mx-auto grid max-w-7xl grid-cols-9">
-		<div class="col-span-2 px-20 py-10">
-			<div class="flex border">
-				<h2 class="text-2xl">SRLEOM</h2>
+<div class="border border-t-0">
+	<div class="mx-auto grid grid-cols-9">
+		<div class="col-span-2 flex flex-col">
+			<div class="border-b px-20 py-10">
+				<h2 class=" text-2xl">SRLEOM</h2>
+			</div>
+
+			<div class="border-b px-20 py-10">
+				<List listArray={data.list} />
 			</div>
 		</div>
 		<div class="col-span-7 border-l px-20 py-10">
@@ -59,12 +55,8 @@
 			>
 
 			<div class="mb-5 {isAddTodoOpen ? 'block' : 'hidden'}">
-				<AddTodo listArray={list} />
+				<AddTodo data={data.addTodoForm} listArray={list} />
 			</div>
-
-			{#if form?.success}
-				<p>Success</p>
-			{/if}
 
 			{#each todo as todoItem (todoItem.id)}
 				<Todo

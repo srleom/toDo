@@ -1,15 +1,10 @@
 <script>
-	import { enhance } from '$app/forms';
+	import { superForm } from 'sveltekit-superforms/client';
+	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
-	/**
-	 * @type {string}
-	 */
-	export let todo = '';
+	export let data;
 
-	export let today = new Date();
-	export let due_date = today.toISOString().slice(0, 10);
-
-	export let list = '';
+	const { form, errors, enhance } = superForm(data);
 
 	/**
 	 * @typedef {Object} listArray
@@ -22,14 +17,11 @@
 	 * @type {listArray[]}
 	 */
 	export let listArray = [];
-
-	$: {
-		list = list || 'Inbox';
-	}
 </script>
 
+<SuperDebug data={$form} />
 <div class="rounded-lg border border-gray-500 px-8 py-4 focus-within:border-blue">
-	<form method="POST" action="?/add" class="flex items-end justify-between space-x-6">
+	<form method="POST" action="?/addTodo" class="flex items-end justify-between space-x-6" use:enhance>
 		<div class="flex items-start gap-6">
 			<div>
 				<input type="checkbox" class="mt-1 h-5 w-5" disabled />
@@ -38,7 +30,7 @@
 				<input
 					type="text"
 					name="todo"
-					bind:value={todo}
+					bind:value={$form.todo}
 					class="w-64 border-b border-b-gray-300 py-1 text-lg focus:border-b focus:border-b-blue focus:outline-none"
 					placeholder="Todo"
 				/>
@@ -48,12 +40,12 @@
 						type="date"
 						name="due_date"
 						class="rounded-lg border border-gray-300 px-2 text-sm focus:border-blue focus:outline-none"
-						bind:value={due_date}
+						bind:value={$form.due_date}
 					/>
 					<select
 						name="list"
 						id="list"
-						bind:value={list}
+						bind:value={$form.list}
 						class="rounded-lg border border-gray-300 px-2 text-sm focus:border-blue focus:outline-none"
 					>
 						{#each listArray as listItem, listId (listItem.id)}
@@ -61,6 +53,7 @@
 						{/each}
 					</select>
 				</div>
+				<input type="hidden" name="id" bind:value={$form.id} />
 			</div>
 		</div>
 

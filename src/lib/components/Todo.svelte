@@ -19,13 +19,12 @@
 	on:mouseleave={() => (showBin = false)}
 	role="presentation"
 >
-	<form action="?/complete" method="POST" bind:this={form}>
+	<form action="?/completeTodo" method="POST" bind:this={form} use:enhance>
 		<input type="hidden" name="id" hidden value={id} />
 		<input
 			name="completed"
 			type="checkbox"
-			value={completed}
-			bind:checked={completed}
+			checked={completed}
 			class="mt-1 h-5 w-5"
 			on:change={() => form.requestSubmit()}
 		/>
@@ -34,7 +33,7 @@
 	<div class="flex flex-col space-y-3">
 		<div class="flex items-center space-x-5">
 			<p class="text-lg" class:line-through={completed}>{todo}</p>
-			<form action="?/delete" method="POST">
+			<form action="?/deleteTodo" method="POST" use:enhance>
 				<input type="hidden" name="id" hidden value={id} />
 				<button>
 					<img

@@ -1,6 +1,24 @@
 import { supabase } from '$lib/supabaseClient';
-import { error } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
+
+import { superValidate } from 'sveltekit-superforms/server';
+
+// Zod Schema
+
 import { z } from 'zod';
+
+const today = new Date();
+const todayISO = today.toISOString().split('T')[0];
+
+const addTodoSchema = z.object({
+	todo: z
+		.string({ required_error: 'Task is required' })
+		.min(3, { message: 'Task must be more than 2 characters' })
+		.max(128, { message: 'Task must be less than 128 characters' })
+		.trim(),
+	due_date: z.string({ required_error: 'Date is required' }).default(todayISO),
+	list: z.string({ required_error: 'List is required' }).default('Inbox')
+});
 
 // Load data
 
@@ -12,7 +30,7 @@ export async function load() {
 			.select('*')
 			.order('completed', { ascending: true });
 		if (todoError) {
-			throw error(500, { message: 'Database error: ' + todoError.message });
+			throw fail(500, { message: 'Database error: ' + todoError.message });
 		}
 		return todo;
 	};
@@ -20,10 +38,12 @@ export async function load() {
 	const loadList = async () => {
 		const { data: list, error: listError } = await supabase.from('categoryList').select('*');
 		if (listError) {
-			throw error(500, { message: 'Database error: ' + listError.message });
+			throw fail(500, { message: 'Database error: ' + listError.message });
 		}
 		return list;
 	};
+
+	const addTodoForm = await superValidate(addTodoSchema);
 
 	try {
 		const todo = await loadTodo();
@@ -31,7 +51,8 @@ export async function load() {
 
 		return {
 			todo,
-			list
+			list,
+			addTodoForm
 		};
 	} catch (e) {
 		// Handle any potential errors here
@@ -41,53 +62,27 @@ export async function load() {
 	}
 }
 
-// Zod schema
-
-const addTodoSchema = z.object({
-	todo: z
-		.string({ required_error: 'Task is required' })
-		.min(3, { message: 'Task must be more than 2 characters' })
-		.max(128, { message: 'Task must be less than 128 characters' })
-		.trim(),
-	due_date: z.string({ required_error: 'Date is required' }),
-	list: z.string({ required_error: 'List is required' }),
-	id: z.string({ required_error: 'Id is required' }).uuid()
-});
-
 // Form actions
 
 export const actions = {
-	add: async ({ request }) => {
-		try {
-			const formData = Object.fromEntries(await request.formData());
+	addTodo: async ({ request }) => {
+		const addTodoForm = await superValidate(request, addTodoSchema);
+		// @ts-ignore
+		addTodoForm.data.id = crypto.randomUUID();
+		console.log('POST', addTodoForm);
 
-			const newTodo = {
-				...formData,
-				id: crypto.randomUUID() // Implement a unique ID generation function
-			};
-
-			const result = addTodoSchema.parse(newTodo);
-			console.log(result);
-
-			const { error } = await supabase.from('toDo').upsert([newTodo]);
-			return { success: true };
-		} catch (error) {
-			// @ts-ignore
-			const { fieldErrors: errors } = error.flatten();
-			console.log(errors);
-
-			return {
-				success: false,
-				error: 'An error occurred while processing form data.'
-			};
+		if (!addTodoForm.valid) {
+			return fail(400, { addTodoForm });
 		}
+
+		const { error } = await supabase.from('toDo').upsert([addTodoForm.data]);
+		return { addTodoForm };
 	},
 
-	complete: async ({ request }) => {
+	completeTodo: async ({ request }) => {
 		try {
 			const formData = await request.formData();
 			const completed = formData.get('completed');
-			console.log(completed);
 			const id = formData.get('id');
 
 			const { data } = await supabase
@@ -102,7 +97,7 @@ export const actions = {
 		}
 	},
 
-	delete: async ({ request }) => {
+	deleteTodo: async ({ request }) => {
 		try {
 			const formData = await request.formData();
 

@@ -20,6 +20,14 @@ const addTodoSchema = z.object({
 	list: z.string({ required_error: 'List is required' }).default('Inbox')
 });
 
+const addListSchema = z.object({
+	list_name: z
+		.string({ required_error: 'List is required' })
+		.min(2, { message: 'List must be more than 1 character' })
+		.max(49, { message: 'List must be less than 50 characters' })
+		.trim()
+});
+
 // Load data
 
 /** @type {import('./$types').PageServerLoad} */
@@ -44,6 +52,7 @@ export async function load() {
 	};
 
 	const addTodoForm = await superValidate(addTodoSchema);
+	const addListForm = await superValidate(addListSchema);
 
 	try {
 		const todo = await loadTodo();
@@ -52,7 +61,8 @@ export async function load() {
 		return {
 			todo,
 			list,
-			addTodoForm
+			addTodoForm,
+			addListForm
 		};
 	} catch (e) {
 		// Handle any potential errors here
@@ -109,6 +119,18 @@ export const actions = {
 				error: 'Error deleting data.'
 			};
 		}
+	},
+
+	addList: async ({ request }) => {
+		const addListForm = await superValidate(request, addListSchema);
+		console.log('POST', addListForm);
+
+		if (!addListForm.valid) {
+			return fail(400, { addListForm });
+		}
+
+		const { error } = await supabase.from('list').upsert([addListForm.data]);
+		return { addListForm };
 	},
 
 	deleteList: async ({ request }) => {

@@ -17,11 +17,6 @@
 </script>
 
 <div>
-	<div class="flex justify-between">
-		<h2 class="mb-2 text-2xl font-medium">Lists</h2>
-		<button class="relative mb-2 text-2xl hover:text-blue">+</button>
-	</div>
-
 	<ul class="mt-3 flex flex-col text-lg">
 		{#each listArray as listItem, listId (listItem.id)}
 			<div

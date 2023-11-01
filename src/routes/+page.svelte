@@ -1,8 +1,9 @@
 <script>
-	import AddTodo from '$lib/components/AddTodo.svelte';
 	import Todo from '$lib/components/Todo.svelte';
 	import List from '$lib/components/List.svelte';
-	import { isAddTodoOpen, addTodoSuccess } from '../stores';
+	import AddTodo from '$lib/components/AddTodo.svelte';
+	import AddList from '$lib/components/AddList.svelte';
+	import { isAddTodoOpen, addTodoSuccess, isAddListOpen, addListSuccess } from '../stores';
 
 	import toast, { Toaster } from 'svelte-french-toast';
 
@@ -35,8 +36,12 @@
 		isAddTodoOpen.set(!$isAddTodoOpen);
 	}
 
+	function toggleAddList() {
+		isAddListOpen.set(!$isAddListOpen);
+	}
+
 	$: if ($addTodoSuccess) {
-		toast.success('Added todo!');
+		toast.success('Todo added!');
 		addTodoSuccess.set(false);
 	} else if (form?.completeTodoSuccess && form?.completed === 'on') {
 		toast.success('Todo completed!');
@@ -44,6 +49,9 @@
 		toast.success('Todo un-completed!');
 	} else if (form?.deleteTodoSuccess) {
 		toast.success('Todo deleted!');
+	} else if ($addListSuccess) {
+		toast.success('List added!');
+		addListSuccess.set(false);
 	} else if (form?.deleteListSuccess) {
 		toast.success('List deleted!');
 	}
@@ -58,8 +66,19 @@
 				<h2 class=" text-2xl">SRLEOM</h2>
 			</div>
 
-			<div class="border-b px-20 py-10">
+			<div class="px-20 py-10">
+				<div class="flex justify-between">
+					<h2 class="mb-2 text-2xl font-medium">Lists</h2>
+					<button
+						class="relative mb-2 text-2xl transition ease-in-out hover:rotate-45 hover:scale-110 hover:text-blue hover:duration-100"
+						on:click={toggleAddList}>+</button
+					>
+				</div>
 				<List listArray={data.list} />
+
+				<div class="mb-5 {$isAddListOpen ? 'block' : 'hidden'}">
+					<AddList data={data.addListForm} />
+				</div>
 			</div>
 		</div>
 		<div class="col-span-7 border-l px-20 py-10">

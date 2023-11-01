@@ -1,8 +1,7 @@
 <script>
 	import { superForm } from 'sveltekit-superforms/client';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-	import { isAddTodoOpen } from '../../stores';
-	import { addTodoSuccess } from '../../stores';
+	import { isAddTodoOpen, addTodoSuccess } from '../../stores';
 
 	export let data;
 
@@ -29,7 +28,7 @@
 	export let listArray = [];
 </script>
 
-<SuperDebug data={$form} />
+<!-- <SuperDebug data={$form} /> -->
 <div class="rounded-lg border border-gray-500 px-8 py-4 focus-within:border-blue">
 	<form
 		method="POST"

@@ -13,7 +13,7 @@ const todayISO = today.toISOString().split('T')[0];
 const addTodoSchema = z.object({
 	todo: z
 		.string({ required_error: 'Task is required' })
-		.min(3, { message: 'Task must be more than 2 characters' })
+		.min(2, { message: 'Task must be more than 1 character' })
 		.max(128, { message: 'Task must be less than 128 characters' })
 		.trim(),
 	due_date: z.string({ required_error: 'Date is required' }).default(todayISO),
@@ -36,7 +36,7 @@ export async function load() {
 	};
 
 	const loadList = async () => {
-		const { data: list, error: listError } = await supabase.from('categoryList').select('*');
+		const { data: list, error: listError } = await supabase.from('list').select('*');
 		if (listError) {
 			throw fail(500, { message: 'Database error: ' + listError.message });
 		}
@@ -67,8 +67,6 @@ export async function load() {
 export const actions = {
 	addTodo: async ({ request }) => {
 		const addTodoForm = await superValidate(request, addTodoSchema);
-		// @ts-ignore
-		addTodoForm.data.id = crypto.randomUUID();
 		console.log('POST', addTodoForm);
 
 		if (!addTodoForm.valid) {
@@ -91,7 +89,7 @@ export const actions = {
 				.eq('id', id)
 				.select();
 
-			return { success: true };
+			return { completeTodoSuccess: true, completed };
 		} catch (error) {
 			console.log(error);
 		}
@@ -100,12 +98,26 @@ export const actions = {
 	deleteTodo: async ({ request }) => {
 		try {
 			const formData = await request.formData();
-
 			const id = formData.get('id');
-
 			const { error } = await supabase.from('toDo').delete().eq('id', id);
 
-			return { success: true };
+			return { deleteTodoSuccess: true };
+		} catch (error) {
+			console.error('Error deleting data:', error);
+			return {
+				success: false,
+				error: 'Error deleting data.'
+			};
+		}
+	},
+
+	deleteList: async ({ request }) => {
+		try {
+			const formData = await request.formData();
+			const id = formData.get('id');
+			const { error } = await supabase.from('list').delete().eq('id', id);
+
+			return { deleteListSuccess: true };
 		} catch (error) {
 			console.error('Error deleting data:', error);
 			return {

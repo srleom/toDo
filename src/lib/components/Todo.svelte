@@ -1,5 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
+
 	export let todo = 'Todo';
 	export let due_date = '2023-10-8';
 	export let list = 'Inbox';
@@ -31,7 +32,7 @@
 		<input type="hidden" name="completed" value="false" />
 	</form>
 	<div class="flex flex-col space-y-3">
-		<div class="flex items-center space-x-5">
+		<div class="flex items-end space-x-5">
 			<p class="text-lg" class:line-through={completed}>{todo}</p>
 			<form action="?/deleteTodo" method="POST" use:enhance>
 				<input type="hidden" name="id" hidden value={id} />

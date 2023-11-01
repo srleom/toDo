@@ -1,4 +1,6 @@
 <script>
+	import { enhance } from '$app/forms';
+
 	/**
 	 * @typedef {Object} List
 	 * @property {string} id - The ID of the object.
@@ -31,13 +33,27 @@
 				<a href="/{listItem.list_name.toLowerCase()}" class="hover:text-blue"
 					>{listItem.list_name}</a
 				>
-				<div class={showIcons ? 'block' : 'hidden'}>
-					<button>
-						<img src="/icons/edit.svg" alt="edit" class="h-4 opacity-30 hover:opacity-100" />
-					</button>
-					<button>
-						<img src="/icons/bin.svg" alt="delete" class="h-4 opacity-30 hover:opacity-100" />
-					</button>
+				<div class="flex gap-1 {showIcons ? 'block' : 'hidden'}">
+					<!-- <form action="" method="POST" use:enhance>
+						<input type="hidden" name="id" hidden value={listItem.id} />
+						<button>
+							<img
+								src="icons/edit.svg"
+								alt="delete list"
+								class="h-4 cursor-pointer opacity-30 hover:opacity-100"
+							/>
+						</button>
+					</form> -->
+					<form action="?/deleteList" method="POST" use:enhance>
+						<input type="hidden" name="id" hidden value={listItem.id} />
+						<button>
+							<img
+								src="icons/bin.svg"
+								alt="delete list"
+								class="h-4 cursor-pointer opacity-30 hover:opacity-100"
+							/>
+						</button>
+					</form>
 				</div>
 			</div>
 		{/each}

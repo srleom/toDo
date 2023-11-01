@@ -2,6 +2,9 @@
 	import AddTodo from '$lib/components/AddTodo.svelte';
 	import Todo from '$lib/components/Todo.svelte';
 	import List from '$lib/components/List.svelte';
+	import { isAddTodoOpen, addTodoSuccess } from '../stores';
+
+	import toast, { Toaster } from 'svelte-french-toast';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -28,12 +31,25 @@
 	$: todo = data.todo;
 	$: list = data.list;
 
-	let isAddTodoOpen = false;
+	function toggleAddTodo() {
+		isAddTodoOpen.set(!$isAddTodoOpen);
+	}
 
-	function openAddTodo() {
-		isAddTodoOpen = !isAddTodoOpen;
+	$: if ($addTodoSuccess) {
+		toast.success('Added todo!');
+		addTodoSuccess.set(false);
+	} else if (form?.completeTodoSuccess && form?.completed === 'on') {
+		toast.success('Todo completed!');
+	} else if (form?.completeTodoSuccess && form?.completed === 'false') {
+		toast.success('Todo un-completed!');
+	} else if (form?.deleteTodoSuccess) {
+		toast.success('Todo deleted!');
+	} else if (form?.deleteListSuccess) {
+		toast.success('List deleted!');
 	}
 </script>
+
+<Toaster />
 
 <div class="border border-t-0">
 	<div class="mx-auto grid grid-cols-9">
@@ -50,11 +66,11 @@
 			<h2 class="text-2xl">Todo</h2>
 			<div class="mb-5 mt-5 h-[1px] bg-black" />
 
-			<button class="mb-5 rounded-lg bg-indigo-600 px-4 py-2 text-white" on:click={openAddTodo}
+			<button class="mb-5 rounded-lg bg-indigo-600 px-4 py-2 text-white" on:click={toggleAddTodo}
 				>+ New Task</button
 			>
 
-			<div class="mb-5 {isAddTodoOpen ? 'block' : 'hidden'}">
+			<div class="mb-5 {$isAddTodoOpen ? 'block' : 'hidden'}">
 				<AddTodo data={data.addTodoForm} listArray={list} />
 			</div>
 

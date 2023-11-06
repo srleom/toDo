@@ -2,10 +2,15 @@
 	import { enhance } from '$app/forms';
 
 	export let todo = 'Todo';
-	export let due_date = '2023-10-8';
 	export let list = 'Inbox';
 	export let completed = false;
 	export let id = '';
+
+	export let dueDate = '2023-11-06T00:00:00.000Z';
+	const date = new Date(dueDate);
+	const options = { year: 'numeric', month: 'short', day: 'numeric' };
+	// @ts-ignore
+	const formattedDueDate = date.toLocaleDateString('en-US', options);
 
 	// Hover delete effect
 	let showBin = false;
@@ -29,7 +34,7 @@
 			class="mt-1 h-5 w-5"
 			on:change={() => form.requestSubmit()}
 		/>
-		<input type="hidden" name="completed" value="false" />
+		<input type="hidden" name="completed" value="off" />
 	</form>
 	<div class="flex flex-col space-y-3">
 		<div class="flex items-end space-x-5">
@@ -47,7 +52,7 @@
 		</div>
 
 		<div class="flex space-x-5">
-			<p class="rounded-lg border border-gray-300 px-2 text-sm">{due_date}</p>
+			<p class="rounded-lg border border-gray-300 px-2 text-sm">{formattedDueDate}</p>
 			<p class="rounded-lg border border-gray-300 px-2 text-sm">{list}</p>
 		</div>
 	</div>

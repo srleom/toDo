@@ -3,8 +3,7 @@
 	import List from '$lib/components/List.svelte';
 	import AddTodo from '$lib/components/AddTodo.svelte';
 	import AddList from '$lib/components/AddList.svelte';
-	import { isAddTodoOpen, addTodoSuccess, isAddListOpen, addListSuccess } from '../stores';
-
+	import { isAddTodoOpen, isAddListOpen } from '../stores';
 	import toast, { Toaster } from 'svelte-french-toast';
 
 	/** @type {import('./$types').PageData} */
@@ -16,9 +15,9 @@
 	/**
 	 * @typedef {Object} Todo
 	 * @property {string} id - The ID of the object.
-	 * @property {Date} created_at - The creation date.
+	 * @property {Date} createdAt - The creation date.
 	 * @property {string} todo - The task to be done.
-	 * @property {string} due_date - The due date of the task (as a string).
+	 * @property {string} dueDate - The due date of the task (as a string).
 	 * @property {string} list - The list to which the task belongs.
 	 * @property {boolean} completed - Whether the task is completed.
 	 */
@@ -30,6 +29,19 @@
 
 	// @ts-ignore
 	$: todo = data.todo;
+
+	/**
+	 * @typedef {Object} List
+	 * @property {string} id - The ID of the object.
+	 * @property {string} listName - The task to be done.
+	 * @property {Date} createdAt - Created at.
+	 */
+
+	/**
+	 * An array of List objects.
+	 * @type {List[]}
+	 */
+	// @ts-ignore
 	$: list = data.list;
 
 	function toggleAddTodo() {
@@ -40,18 +52,16 @@
 		isAddListOpen.set(!$isAddListOpen);
 	}
 
-	$: if ($addTodoSuccess) {
+	$: if (form?.addTodoSuccess) {
 		toast.success('Todo added!');
-		addTodoSuccess.set(false);
-	} else if (form?.completeTodoSuccess && form?.completed === 'on') {
+	} else if (form?.completeTodoSuccess && form?.completed) {
 		toast.success('Todo completed!');
-	} else if (form?.completeTodoSuccess && form?.completed === 'false') {
+	} else if (form?.completeTodoSuccess && !form?.completed) {
 		toast.success('Todo un-completed!');
 	} else if (form?.deleteTodoSuccess) {
 		toast.success('Todo deleted!');
-	} else if ($addListSuccess) {
+	} else if (form?.addListSuccess) {
 		toast.success('List added!');
-		addListSuccess.set(false);
 	} else if (form?.deleteListSuccess) {
 		toast.success('List deleted!');
 	}
@@ -74,7 +84,7 @@
 						on:click={toggleAddList}>+</button
 					>
 				</div>
-				<List listArray={data.list} />
+				<List listArray={list} />
 
 				<div class="mb-5 {$isAddListOpen ? 'block' : 'hidden'}">
 					<AddList data={data.addListForm} />
@@ -96,7 +106,7 @@
 			{#each todo as todoItem (todoItem.id)}
 				<Todo
 					todo={todoItem.todo}
-					due_date={todoItem.due_date}
+					dueDate={todoItem.dueDate}
 					list={todoItem.list}
 					completed={todoItem.completed}
 					id={todoItem.id}

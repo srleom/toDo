@@ -1,11 +1,20 @@
-import { supabase } from '$lib/supabaseClient';
+import { supabase } from '$lib/server/supabaseClient';
 import { fail } from '@sveltejs/kit';
 
 import { superValidate } from 'sveltekit-superforms/server';
+import { z } from 'zod';
+
+import {
+	loadTodo,
+	loadList,
+	insertTodo,
+	completeTodo,
+	insertList,
+	deleteTodo,
+	deleteList
+} from '$lib/server/queries';
 
 // Zod Schema
-
-import { z } from 'zod';
 
 const today = new Date();
 const todayISO = today.toISOString().split('T')[0];
@@ -16,12 +25,12 @@ const addTodoSchema = z.object({
 		.min(2, { message: 'Task must be more than 1 character' })
 		.max(128, { message: 'Task must be less than 128 characters' })
 		.trim(),
-	due_date: z.string({ required_error: 'Date is required' }).default(todayISO),
+	dueDate: z.string({ required_error: 'Date is required' }).default(todayISO),
 	list: z.string({ required_error: 'List is required' }).default('Inbox')
 });
 
 const addListSchema = z.object({
-	list_name: z
+	listName: z
 		.string({ required_error: 'List is required' })
 		.min(2, { message: 'List must be more than 1 character' })
 		.max(49, { message: 'List must be less than 50 characters' })
@@ -32,31 +41,30 @@ const addListSchema = z.object({
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load() {
-	const loadTodo = async () => {
-		const { data: todo, error: todoError } = await supabase
-			.from('toDo')
-			.select('*')
-			.order('completed', { ascending: true });
-		if (todoError) {
-			throw fail(500, { message: 'Database error: ' + todoError.message });
-		}
-		return todo;
-	};
+	// const loadTodo = async () => {
+	// 	const { data: todo, error: todoError } = await supabase
+	// 		.from('toDo')
+	// 		.select('*')
+	// 		.order('completed', { ascending: true });
+	// 	if (todoError) {
+	// 		throw fail(500, { message: 'Database error: ' + todoError.message });
+	// 	}
+	// 	return todo;
+	// };
 
-	const loadList = async () => {
-		const { data: list, error: listError } = await supabase.from('list').select('*');
-		if (listError) {
-			throw fail(500, { message: 'Database error: ' + listError.message });
-		}
-		return list;
-	};
-
-	const addTodoForm = await superValidate(addTodoSchema);
-	const addListForm = await superValidate(addListSchema);
+	// const loadList = async () => {
+	// 	const { data: list, error: listError } = await supabase.from('list').select('*');
+	// 	if (listError) {
+	// 		throw fail(500, { message: 'Database error: ' + listError.message });
+	// 	}
+	// 	return list;
+	// };
 
 	try {
 		const todo = await loadTodo();
 		const list = await loadList();
+		const addTodoForm = await superValidate(addTodoSchema);
+		const addListForm = await superValidate(addListSchema);
 
 		return {
 			todo,
@@ -76,32 +84,47 @@ export async function load() {
 
 export const actions = {
 	addTodo: async ({ request }) => {
-		const addTodoForm = await superValidate(request, addTodoSchema);
-		console.log('POST', addTodoForm);
+		try {
+			const addTodoForm = await superValidate(request, addTodoSchema);
+			console.log('POST', addTodoForm);
 
-		if (!addTodoForm.valid) {
-			return fail(400, { addTodoForm });
+			if (!addTodoForm.valid) {
+				return fail(400, { addTodoForm });
+			}
+			const insertedTodo = await insertTodo(addTodoForm.data);
+			return { addTodoSuccess: true, addTodoForm, insertedTodo };
+		} catch (error) {
+			console.error(error);
+			return {
+				addTodoSuccess: false,
+				error: 'Error adding todo.'
+			};
 		}
-
-		const { error } = await supabase.from('toDo').upsert([addTodoForm.data]);
-		return { addTodoForm };
 	},
 
 	completeTodo: async ({ request }) => {
 		try {
 			const formData = await request.formData();
-			const completed = formData.get('completed');
+			let completed = formData.get('completed');
+			if (completed === 'on') {
+				// @ts-ignore
+				completed = true;
+			} else if (completed === 'off') {
+				// @ts-ignore
+				completed = false;
+			}
 			const id = formData.get('id');
+			const completedTodo = { completed, id };
 
-			const { data } = await supabase
-				.from('toDo')
-				.update({ completed: completed })
-				.eq('id', id)
-				.select();
-
-			return { completeTodoSuccess: true, completed };
+			// @ts-ignore
+			const updatedTodo = await completeTodo(completedTodo);
+			return { completeTodoSuccess: true, completed: updatedTodo[0].completed };
 		} catch (error) {
-			console.log(error);
+			console.error(error);
+			return {
+				completeTodoSuccess: false,
+				error: 'Error completing todo.'
+			};
 		}
 	},
 
@@ -109,42 +132,51 @@ export const actions = {
 		try {
 			const formData = await request.formData();
 			const id = formData.get('id');
-			const { error } = await supabase.from('toDo').delete().eq('id', id);
 
-			return { deleteTodoSuccess: true };
+			// @ts-ignore
+			const deletedTodo = await deleteTodo(id);
+			return { deleteTodoSuccess: true, deletedTodo };
 		} catch (error) {
-			console.error('Error deleting data:', error);
+			console.error(error);
 			return {
-				success: false,
-				error: 'Error deleting data.'
+				deleteTodoSuccess: false,
+				error: 'Error deleting todo.'
 			};
 		}
 	},
 
 	addList: async ({ request }) => {
-		const addListForm = await superValidate(request, addListSchema);
-		console.log('POST', addListForm);
+		try {
+			const addListForm = await superValidate(request, addListSchema);
+			console.log('POST LIST', addListForm);
 
-		if (!addListForm.valid) {
-			return fail(400, { addListForm });
+			if (!addListForm.valid) {
+				return fail(400, { addListForm });
+			}
+			const insertedList = await insertList(addListForm.data);
+			return { addListSuccess: true, addListForm, insertedList };
+		} catch (error) {
+			console.error(error);
+			return {
+				addListSuccess: false,
+				error: 'Error adding list.'
+			};
 		}
-
-		const { error } = await supabase.from('list').upsert([addListForm.data]);
-		return { addListForm };
 	},
 
 	deleteList: async ({ request }) => {
 		try {
 			const formData = await request.formData();
 			const id = formData.get('id');
-			const { error } = await supabase.from('list').delete().eq('id', id);
 
-			return { deleteListSuccess: true };
+			// @ts-ignore
+			const deletedList = await deleteList(id);
+			return { deleteListSuccess: true, deletedList };
 		} catch (error) {
-			console.error('Error deleting data:', error);
+			console.error(error);
 			return {
-				success: false,
-				error: 'Error deleting data.'
+				deleteListSuccess: false,
+				error: 'Error deleting list.'
 			};
 		}
 	}

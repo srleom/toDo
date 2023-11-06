@@ -4,7 +4,8 @@
 	/**
 	 * @typedef {Object} List
 	 * @property {string} id - The ID of the object.
-	 * @property {string} list_name - The task to be done.
+	 * @property {string} listName - The task to be done.
+	 * @property {Date} createdAt - Created at.
 	 */
 
 	/**
@@ -25,9 +26,7 @@
 				on:mouseenter={() => (showIcons = true)}
 				on:mouseleave={() => (showIcons = false)}
 			>
-				<a href="/{listItem.list_name.toLowerCase()}" class="hover:text-blue"
-					>{listItem.list_name}</a
-				>
+				<a href="/{listItem.listName.toLowerCase()}" class="hover:text-blue">{listItem.listName}</a>
 				<div class="flex gap-1 {showIcons ? 'block' : 'hidden'}">
 					<!-- <form action="" method="POST" use:enhance>
 						<input type="hidden" name="id" hidden value={listItem.id} />

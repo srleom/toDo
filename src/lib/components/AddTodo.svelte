@@ -1,31 +1,31 @@
 <script>
 	import { superForm } from 'sveltekit-superforms/client';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-	import { isAddTodoOpen, addTodoSuccess } from '../../stores';
+	import { isAddTodoOpen } from '../../stores';
 
 	export let data;
+
+	/**
+	 * @typedef {Object} List
+	 * @property {string} id - The ID of the object.
+	 * @property {string} listName - The task to be done.
+	 * @property {Date} createdAt - Created at.
+	 */
+
+	/**
+	 * An array of List objects.
+	 * @type {List[]}
+	 */
+	export let listArray = [];
 
 	const { form, errors, enhance } = superForm(data, {
 		resetForm: true,
 		onResult({ result }) {
 			if (result.type === 'success') {
 				isAddTodoOpen.set(false);
-				addTodoSuccess.set(true);
 			}
 		}
 	});
-
-	/**
-	 * @typedef {Object} listArray
-	 * @property {number} id - list id
-	 * @property {string} list_name - list name
-	 */
-
-	/**
-	 * Array of lists for select option
-	 * @type {listArray[]}
-	 */
-	export let listArray = [];
 </script>
 
 <!-- <SuperDebug data={$form} /> -->
@@ -54,12 +54,12 @@
 				<div class="flex space-x-5">
 					<input
 						type="date"
-						name="due_date"
-						aria-invalid={$errors.due_date ? 'true' : undefined}
+						name="dueDate"
+						aria-invalid={$errors.dueDate ? 'true' : undefined}
 						class="rounded-lg border border-gray-300 px-2 text-sm focus:border-blue focus:outline-none"
-						bind:value={$form.due_date}
+						bind:value={$form.dueDate}
 					/>
-					{#if $errors.due_date}<span class="text-sm font-light">{$errors.due_date}</span>{/if}
+					{#if $errors.dueDate}<span class="text-sm font-light">{$errors.dueDate}</span>{/if}
 					<select
 						name="list"
 						aria-invalid={$errors.list ? 'true' : undefined}
@@ -68,7 +68,7 @@
 						class="rounded-lg border border-gray-300 px-2 text-sm focus:border-blue focus:outline-none"
 					>
 						{#each listArray as listItem, listId (listItem.id)}
-							<option value={listItem.list_name}>{listItem.list_name}</option>
+							<option value={listItem.listName}>{listItem.listName}</option>
 						{/each}
 					</select>
 					{#if $errors.list}<span class="text-sm font-light">{$errors.list}</span>{/if}

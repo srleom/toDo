@@ -1,4 +1,4 @@
-import { asc, desc, eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import db from './db';
 import { toDo, list } from './schema';
 
@@ -10,6 +10,16 @@ export async function loadTodo() {
 export async function loadList() {
 	const allList = await db.select().from(list);
 	return allList;
+}
+
+/** @param {string} params */
+export async function loadSpecificTodo(params) {
+	const specificTodo = await db
+		.select()
+		.from(toDo)
+		.orderBy(asc(toDo.completed))
+		.where(eq(toDo.list, params));
+	return specificTodo;
 }
 
 /**

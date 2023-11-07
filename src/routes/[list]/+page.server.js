@@ -4,7 +4,7 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 
 import {
-	loadTodo,
+	loadSpecificTodo,
 	loadList,
 	insertTodo,
 	completeTodo,
@@ -12,6 +12,7 @@ import {
 	deleteTodo,
 	deleteList
 } from '$lib/server/queries';
+import { toPascalCase } from '$lib/utils';
 
 // Zod Schema
 
@@ -39,28 +40,11 @@ const addListSchema = z.object({
 // Load data
 
 /** @type {import('./$types').PageServerLoad} */
-export async function load() {
-	// const loadTodo = async () => {
-	// 	const { data: todo, error: todoError } = await supabase
-	// 		.from('toDo')
-	// 		.select('*')
-	// 		.order('completed', { ascending: true });
-	// 	if (todoError) {
-	// 		throw fail(500, { message: 'Database error: ' + todoError.message });
-	// 	}
-	// 	return todo;
-	// };
-
-	// const loadList = async () => {
-	// 	const { data: list, error: listError } = await supabase.from('list').select('*');
-	// 	if (listError) {
-	// 		throw fail(500, { message: 'Database error: ' + listError.message });
-	// 	}
-	// 	return list;
-	// };
+export async function load({ params }) {
+	const pageName = toPascalCase(params.list);
 
 	try {
-		const todo = await loadTodo();
+		const todo = await loadSpecificTodo(pageName);
 		const list = await loadList();
 		const addTodoForm = await superValidate(addTodoSchema);
 		const addListForm = await superValidate(addListSchema);

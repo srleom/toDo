@@ -17,8 +17,9 @@
 	let showIcons = false;
 </script>
 
-<div>
-	<ul class="mt-3 flex flex-col text-lg">
+<div class="mt-3">
+	<ul class=" flex flex-col text-lg">
+		<a href="/" data-sveltekit-preload-data>All lists</a>
 		{#each listArray as listItem, listId (listItem.id)}
 			<div
 				role="presentation"
@@ -26,18 +27,12 @@
 				on:mouseenter={() => (showIcons = true)}
 				on:mouseleave={() => (showIcons = false)}
 			>
-				<a href="/{listItem.listName.toLowerCase()}" class="hover:text-blue">{listItem.listName}</a>
+				<a
+					href="/{listItem.listName.toLowerCase()}"
+					class="hover:text-blue"
+					data-sveltekit-preload-data>{listItem.listName}</a
+				>
 				<div class="flex gap-1 {showIcons ? 'block' : 'hidden'}">
-					<!-- <form action="" method="POST" use:enhance>
-						<input type="hidden" name="id" hidden value={listItem.id} />
-						<button>
-							<img
-								src="icons/edit.svg"
-								alt="delete list"
-								class="h-4 cursor-pointer opacity-30 hover:opacity-100"
-							/>
-						</button>
-					</form> -->
 					<form action="?/deleteList" method="POST" use:enhance>
 						<input type="hidden" name="id" hidden value={listItem.id} />
 						<button>

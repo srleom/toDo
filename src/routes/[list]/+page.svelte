@@ -6,10 +6,10 @@
 	import { isAddTodoOpen, isAddListOpen } from '../../stores';
 	import toast, { Toaster } from 'svelte-french-toast';
 
-    import { page } from '$app/stores';
+	import { page } from '$app/stores';
 	import { toPascalCase } from '$lib/utils';
 
-    let pageName = toPascalCase($page.params.list)
+	let pageName = toPascalCase($page.params.list);
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -107,6 +107,10 @@
 			<div class="mb-5 {$isAddTodoOpen ? 'block' : 'hidden'}">
 				<AddTodo data={data.addTodoForm} listArray={list} />
 			</div>
+
+			{#if todo.length === 0}
+				<p class="rounded-lg border px-8 py-4 text-lg">No todos in this list. Hooray! 🎉</p>
+			{/if}
 
 			{#each todo as todoItem (todoItem.id)}
 				<Todo

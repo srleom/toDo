@@ -103,6 +103,10 @@
 				<AddTodo data={data.addTodoForm} listArray={list} />
 			</div>
 
+			{#if todo.length === 0}
+				<p class="rounded-lg border px-8 py-4 text-lg">No todos at all. Hooray! 🎉</p>
+			{/if}
+
 			{#each todo as todoItem (todoItem.id)}
 				<Todo
 					todo={todoItem.todo}

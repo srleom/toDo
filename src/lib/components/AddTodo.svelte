@@ -2,12 +2,11 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 	import { isAddTodoOpen } from '../stores';
-	import { onMount } from 'svelte';
 
 	export let data;
 
 	/** @type {number | undefined} */
-	export let ownerId;
+	export let owner_id;
 
 	const { form, errors, enhance } = superForm(data, {
 		resetForm: true,
@@ -18,27 +17,20 @@
 		}
 	});
 
-	/**
-	 * @typedef {Object} List
-	 * @property {string} id - The ID of the object.
-	 * @property {string} listName - The task to be done.
-	 */
-
-	/**
-	 * An array of List objects.
-	 * @type {List[]}
-	 */
 	export let listArray = [];
 
-	let listId = '';
+	let list_id = '';
 	function selectListId() {
-		const selectedList = listArray.find((listArray) => listArray.listName === $form.list);
+		const selectedList = listArray.find((listArray) => listArray.list_name === $form.list_name);
 		if (selectedList) {
-			listId = selectedList.id;
+			list_id = selectedList.id;
+			console.log(list_id);
 		}
 	}
 
-	onMount(() => selectListId());
+	$: if ($isAddTodoOpen) {
+		selectListId();
+	}
 </script>
 
 <!-- <SuperDebug data={$form} /> -->
@@ -52,7 +44,7 @@
 		<div class="flex items-start gap-6">
 			<div>
 				<input type="checkbox" class="mt-1 h-5 w-5" disabled />
-				<input type="hidden" name="ownerId" value={ownerId} />
+				<input type="hidden" name="owner_id" value={owner_id} />
 			</div>
 			<div class="flex flex-col space-y-3">
 				<input
@@ -68,26 +60,26 @@
 				<div class="flex space-x-5">
 					<input
 						type="date"
-						name="dueDate"
-						aria-invalid={$errors.dueDate ? 'true' : undefined}
+						name="due_date"
+						aria-invalid={$errors.due_date ? 'true' : undefined}
 						class="rounded-lg border border-gray-300 px-2 text-sm focus:border-blue focus:outline-none"
-						bind:value={$form.dueDate}
+						bind:value={$form.due_date}
 					/>
-					{#if $errors.dueDate}<span class="text-sm font-light">{$errors.dueDate}</span>{/if}
+					{#if $errors.dueDate}<span class="text-sm font-light">{$errors.due_date}</span>{/if}
 					<select
 						name="list"
-						aria-invalid={$errors.list ? 'true' : undefined}
+						aria-invalid={$errors.list_name ? 'true' : undefined}
 						id="list"
-						bind:value={$form.list}
+						bind:value={$form.list_name}
 						class="rounded-lg border border-gray-300 px-2 text-sm focus:border-blue focus:outline-none"
 						on:change={selectListId}
 					>
 						{#each listArray as listItem (listItem.id)}
-							<option value={listItem.listName}>{listItem.listName}</option>
+							<option value={listItem.list_name}>{listItem.list_name}</option>
 						{/each}
 					</select>
-					{#if $errors.list}<span class="text-sm font-light">{$errors.list}</span>{/if}
-					<input type="hidden" name="listId" bind:value={listId} />
+					{#if $errors.list_name}<span class="text-sm font-light">{$errors.list_name}</span>{/if}
+					<input type="hidden" name="list_id" value={list_id} />
 				</div>
 			</div>
 		</div>

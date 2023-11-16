@@ -38,6 +38,7 @@ export const actions = {
 		console.log('POST', loginForm);
 
 		if (!loginForm.valid) {
+			loginForm.data.password = '';
 			return fail(400, { loginForm });
 		}
 
@@ -48,9 +49,12 @@ export const actions = {
 
 		if (err) {
 			if (err instanceof AuthApiError && err.status === 400) {
-				return setError(loginForm, 'password', 'Invalid email or password.');
-
+				console.log(err);
+				const errMessage = err.toString().slice(14);
+				loginForm.data.password = '';
+				return setError(loginForm, 'password', `${errMessage}`);
 			}
+			loginForm.data.password = '';
 			return setError(loginForm, 'password', 'Server error. Please try again later.');
 		}
 

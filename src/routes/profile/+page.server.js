@@ -1,7 +1,7 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 import { fail, redirect, error } from '@sveltejs/kit';
-import { insertProfile } from '$lib/server/queries';
+import { insertList, insertProfile } from '$lib/server/queries';
 
 const createProfileSchema = z.object({
 	username: z
@@ -53,12 +53,18 @@ export const actions = {
 		}
 
 		const newProfile = {
-			userId: session.user.id,
+			user_id: session.user.id,
 			username: updateProfileForm.data.username,
 			email: session.user.email
 		};
 
 		const insertedProfile = await insertProfile(newProfile);
+
+		// Onboard user
+		const createInboxList = await insertList({
+			list_name: 'Inbox',
+			owner_id: insertedProfile[0].id
+		});
 
 		throw redirect(303, '/dashboard');
 		return { updateProfileForm, insertedProfile };

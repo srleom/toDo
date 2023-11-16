@@ -13,7 +13,6 @@ import {
 	loadUserProfile,
 	getListIdFromName
 } from '$lib/server/queries';
-import { supabase } from '$lib/server/supabaseClient';
 
 // Zod Schema
 
@@ -25,19 +24,19 @@ const addTodoSchema = z.object({
 		.min(2, { message: 'Task must be more than 1 character' })
 		.max(128, { message: 'Task must be less than 128 characters' })
 		.trim(),
-	dueDate: z.string({ required_error: 'Date is required' }).default(todayISO),
-	list: z.string({ required_error: 'List is required' }).default('Inbox'),
-	listId: z.string(),
-	ownerId: z.number()
+	due_date: z.string({ required_error: 'Date is required' }).default(todayISO),
+	list_name: z.string({ required_error: 'List is required' }).default('Inbox'),
+	list_id: z.string(),
+	owner_id: z.number()
 });
 
 const addListSchema = z.object({
-	listName: z
+	list_name: z
 		.string({ required_error: 'List is required' })
 		.min(2, { message: 'List must be more than 1 character' })
 		.max(49, { message: 'List must be less than 50 characters' })
 		.trim(),
-	ownerId: z.number()
+	owner_id: z.number()
 });
 
 // Load data
@@ -46,14 +45,13 @@ const addListSchema = z.object({
 export async function load({ url, locals: { getSession } }) {
 	// Get session
 	const session = await getSession();
-
 	if (!session) {
 		throw redirect(301, '/login');
 	}
 
 	// Check for profile
 	const profileData = await loadUserProfile(session.user.id);
-	if (!profileData) {
+	if (profileData?.length === 0) {
 		throw redirect(301, '/profile');
 	}
 
@@ -69,15 +67,20 @@ export async function load({ url, locals: { getSession } }) {
 	try {
 		const todo = await loadRequiredTodo(profile.id, listIdQueried);
 		const list = await loadAllList(profile.id);
-		console.log(list);
 		const addTodoForm = await superValidate(addTodoSchema);
 		const addListForm = await superValidate(addListSchema);
+
+		const excludeInboxList = { keyToExclude: 'list_name', valueToExclude: 'Inbox' };
+		const listDashboard = list?.filter(
+			(listItem) => listItem[excludeInboxList.keyToExclude] !== excludeInboxList.valueToExclude
+		);
 
 		return {
 			listQueried,
 			profile,
 			todo,
 			list,
+			listDashboard,
 			addTodoForm,
 			addListForm
 		};
@@ -101,9 +104,7 @@ export const actions = {
 			return fail(400, { addTodoForm });
 		}
 
-		// @ts-ignore
-		delete addTodoForm.data.list;
-
+		delete addTodoForm.data.list_name;
 		const insertedTodo = await insertTodo(addTodoForm.data);
 		return { addTodoSuccess: true, addTodoForm, insertedTodo };
 	},
@@ -156,14 +157,14 @@ export const actions = {
 
 	deleteList: async ({ request }) => {
 		const formData = await request.formData();
-		const id = formData.get('id');
+		const list_id = formData.get('list_id');
+		const owner_id = formData.get('owner_id');
 
-		if (!id) {
-			return fail(400, { id });
+		if (!list_id) {
+			return fail(400, { list_id });
 		}
 
-		// @ts-ignore
-		const deletedList = await deleteList(id);
+		const deletedList = await deleteList(owner_id, list_id);
 		throw redirect(301, '/dashboard');
 		return { deleteListSuccess: true, deletedList };
 	}

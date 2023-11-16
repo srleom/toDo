@@ -3,7 +3,7 @@
 1. Create Svelte (w/ ESLint, Prettier, Playwright, ESLint added)
 2. Install Tailwind
 3. Install prettier-plugin-tailwindcss v4.0
-4. Add default mabry font
+4. Add default Mabry font
 
 # create-svelte
 

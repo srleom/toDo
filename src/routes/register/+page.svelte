@@ -1,13 +1,31 @@
 <script>
 	import { superForm } from 'sveltekit-superforms/client';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
+	import toast, { Toaster } from 'svelte-french-toast';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 
-	// @ts-ignore
-	const { form, errors, enhance } = superForm(data.registerForm);
+	/** @type {import('./$types').ActionData} */
+	export let form;
+
+	const {
+		form: registerForm,
+		errors,
+		enhance,
+		delayed
+	} = superForm(data.registerForm, {
+		resetForm: true,
+		delayMs: 500,
+		timeoutMs: 2000
+	});
+
+	$: if (form?.newUserRegistered) {
+		toast.success('Registered successfully!');
+	}
 </script>
+
+<Toaster />
 
 <!-- <SuperDebug data={$form} /> -->
 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -33,7 +51,7 @@
 						name="email"
 						type="email"
 						aria-invalid={$errors.email ? 'true' : undefined}
-						bind:value={$form.email}
+						bind:value={$registerForm.email}
 						autocomplete="email"
 						required
 						class="block w-full rounded-md border-0 px-2.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -58,7 +76,7 @@
 						name="password"
 						type="password"
 						aria-invalid={$errors.password ? 'true' : undefined}
-						bind:value={$form.password}
+						bind:value={$registerForm.password}
 						autocomplete="new-password"
 						required
 						class="block w-full rounded-md border-0 px-2.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -72,9 +90,18 @@
 			<div>
 				<button
 					type="submit"
-					class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-					>Sign in</button
-				>
+					class="flex h-8 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+					>{#if $delayed}Registering...
+					{:else if form?.newUserRegistered}Registered
+					{:else}Register{/if}
+				</button>
+
+				{#if form?.newUserRegistered}
+					<p class="mt-4 text-center text-sm text-indigo-600">
+						Thank you for registering, please check your <span class="font-medium">email</span> for the
+						confirmation link.
+					</p>
+				{/if}
 			</div>
 		</form>
 

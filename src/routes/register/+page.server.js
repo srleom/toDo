@@ -53,7 +53,7 @@ export async function load({ locals: { getSession } }) {
 export const actions = {
 	register: async ({ request, url, locals: { supabase } }) => {
 		const registerNewUserForm = await superValidate(request, registerNewUserSchema);
-		console.log('POST REGISTER NEW USER', registerNewUserForm);
+		console.log('REGISTER NEW USER', registerNewUserForm);
 
 		if (!registerNewUserForm.valid) {
 			return fail(400, { registerNewUserForm });
@@ -66,14 +66,15 @@ export const actions = {
 
 		if (err) {
 			if (err instanceof AuthApiError && err.status === 400) {
+				console.log(err);
 				return setError(registerNewUserForm, 'password', 'Invalid email or password.');
 			}
 			return setError(registerNewUserForm, 'password', 'Server error. Please try again later.');
 		} else {
-			return {};
+			return {
+				registerNewUserForm,
+				newUserRegistered: true
+			};
 		}
-
-		// throw redirect(303, '/dashboard');
-		return { registerNewUserForm };
 	}
 };

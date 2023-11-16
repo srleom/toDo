@@ -21,7 +21,7 @@
 </script>
 
 <svelte:head>
-	<title>Todo</title>
+	<title>toDo</title>
 </svelte:head>
 
 <slot />

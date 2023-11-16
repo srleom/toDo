@@ -5,8 +5,8 @@
 
 	export let data;
 
-	/** @type {number | undefined} */
-	export let ownerId;
+	/** @type {number} */
+	export let owner_id;
 
 	const { form, errors, enhance } = superForm(data, {
 		resetForm: true,
@@ -23,17 +23,17 @@
 
 <!-- <SuperDebug data={$form} /> -->
 <form method="POST" action="?/addList" class="mt-5 flex flex-col items-start space-y-3" use:enhance>
-	<input type="hidden" name="ownerId" value={ownerId} />
+	<input type="hidden" name="owner_id" value={owner_id} />
 	<input
 		type="text"
-		name="listName"
+		name="list_name"
 		aria-invalid={$errors.list ? 'true' : undefined}
-		bind:value={$form.listName}
+		bind:value={$form.list_name}
 		placeholder="Add list"
 		class="flex-1 border-b border-b-gray-300 bg-transparent py-1 focus:border-b focus:border-b-blue focus:outline-none"
 		required
 	/>
-	{#if $errors.listName}<span class="text-sm font-light">{$errors.listName}</span>{/if}
+	{#if $errors.list_name}<span class="text-sm font-light">{$errors.list_name}</span>{/if}
 	<button
 		type="submit"
 		class="w-auto rounded-lg border border-gray-400 px-2 py-1 font-mono text-xs text-gray-400 hover:bg-gray-400 hover:text-black"

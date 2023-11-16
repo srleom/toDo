@@ -51,7 +51,7 @@
 			</form>
 		</div>
 
-		<div class="flex space-x-5">
+		<div class="flex flex-col items-start space-y-1 xs:flex-row xs:space-x-5 xs:space-y-0">
 			<p class="rounded-lg border border-gray-300 px-2 text-sm">{formattedDueDate}</p>
 			<p class="rounded-lg border border-gray-300 px-2 text-sm">{list}</p>
 		</div>

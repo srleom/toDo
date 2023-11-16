@@ -4,7 +4,8 @@
 
 	export let listArray = [];
 
-	let showIcons = false;
+	let showBinIcon = false;
+	let idListHovered = '';
 </script>
 
 <div class="mt-3">
@@ -12,12 +13,23 @@
 		<a href="/dashboard" data-sveltekit-preload-data on:click={() => isSideBarOpen.set(false)}
 			>All lists</a
 		>
+		<a
+			href="/dashboard?list=Inbox"
+			data-sveltekit-preload-data
+			on:click={() => isSideBarOpen.set(false)}>Inbox</a
+		>
 		{#each listArray as listItem (listItem.id)}
 			<div
 				role="presentation"
 				class="mb-1 flex items-center justify-between gap-3"
-				on:mouseenter={() => (showIcons = true)}
-				on:mouseleave={() => (showIcons = false)}
+				on:mouseenter={() => {
+					showBinIcon = true;
+					idListHovered = listItem.id;
+				}}
+				on:mouseleave={() => {
+					showBinIcon = true;
+					idListHovered = '';
+				}}
 			>
 				<a
 					href="/dashboard?list={listItem.list_name}"
@@ -25,9 +37,10 @@
 					data-sveltekit-preload-data
 					on:click={() => isSideBarOpen.set(false)}>{listItem.list_name}</a
 				>
-				<div class="flex gap-1 {showIcons ? 'block' : 'hidden'}">
+				<div class="flex gap-1 {showBinIcon && idListHovered === listItem.id ? 'block' : 'hidden'}">
 					<form action="?/deleteList" method="POST" use:enhance>
-						<input type="hidden" name="id" hidden value={listItem.id} />
+						<input type="hidden" name="owner_id" hidden value={listItem.owner_id} />
+						<input type="hidden" name="list_id" hidden value={listItem.id} />
 						<button>
 							<img
 								src="/icons/bin.svg"

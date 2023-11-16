@@ -8,6 +8,9 @@ module.exports = {
 			},
 			fontFamily: {
 				mabry: ['Mabry Pro', 'sans']
+			},
+			screens: {
+				xs: '425px'
 			}
 		}
 	},

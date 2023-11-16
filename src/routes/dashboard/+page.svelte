@@ -12,9 +12,12 @@
 	/** @type {import('./$types').ActionData} */
 	export let form;
 
-	$: todo = data.todo;
+	const { profile, addListForm, addTodoForm } = data;
 
+	$: todo = data.todo;
 	$: list = data.list;
+	$: listDashboard = data.listDashboard;
+	$: listQueried = data.listQueried;
 
 	function toggleAddTodo() {
 		isAddTodoOpen.set(!$isAddTodoOpen);
@@ -52,7 +55,7 @@
 			>
 				<div class="flex items-center justify-between">
 					<a href="/dashboard" class="-m-1.5 p-1.5" on:click={() => isSideBarOpen.set(false)}>
-						<span class="sr-only">Your Company</span>
+						<span class="sr-only">toDo</span>
 						<img class="h-8 w-auto" src="/favicon.png" alt="" />
 					</a>
 					<button
@@ -73,36 +76,7 @@
 						</svg>
 					</button>
 				</div>
-				<div class="flow-root">
-					<div class="border-b py-8">
-						<div>
-							<p class="font-mono text-xs">WELCOME BACK,</p>
-							<a href="/dashboard" class="text-2xl">{data.profile?.username}</a>
-						</div>
-					</div>
-
-					<div class="mt-8">
-						<div class="flex justify-between">
-							<h2 class="mb-2 text-2xl font-medium">Lists</h2>
-							<button
-								class="relative mb-2 text-2xl transition ease-in-out hover:rotate-45 hover:scale-110 hover:text-blue hover:duration-100"
-								on:click={toggleAddList}>+</button
-							>
-						</div>
-						<List listArray={list} />
-
-						<div class="mb-5 {$isAddListOpen ? 'block' : 'hidden'}">
-							<AddList data={data.addListForm} ownerId={data.profile?.id} />
-						</div>
-						<form action="/logout" method="POST">
-							<button
-								type="submit"
-								class="mt-4 rounded-lg border border-gray-500 px-1 py-0.5 font-mono text-xs"
-								>Logout</button
-							>
-						</form>
-					</div>
-				</div>
+				<div class="flow-root" />
 			</div>
 		</div>
 
@@ -112,7 +86,7 @@
 				<a href="/"><img src="/favicon.png" class="mb-4 h-10 w-auto" alt="Logo" /></a>
 				<div>
 					<p class="font-mono text-xs">WELCOME BACK,</p>
-					<a href="/dashboard" class="text-2xl">{data.profile?.username}</a>
+					<a href="/dashboard" class="text-2xl">{profile?.username}</a>
 				</div>
 				<form action="/logout" method="POST">
 					<button
@@ -131,17 +105,17 @@
 						on:click={toggleAddList}>+</button
 					>
 				</div>
-				<List listArray={list} />
+				<List listArray={listDashboard} />
 
 				<div class="mb-5 {$isAddListOpen ? 'block' : 'hidden'}">
-					<AddList data={data.addListForm} ownerId={data.profile?.id} />
+					<AddList data={addListForm} owner_id={profile?.id} />
 				</div>
 			</div>
 		</div>
 
-		<div class="col-span-9 border-l px-20 py-10 lg:col-span-7">
+		<div class="col-span-9 border-l px-10 py-10 sm:px-20 lg:col-span-7">
 			<div class="flex justify-between">
-				<h2 class="text-2xl">{data.listQueried ? `Todos in ${data.listQueried}` : 'All todos'}</h2>
+				<h2 class="text-2xl">{listQueried ? `Todos in ${listQueried}` : 'All todos'}</h2>
 
 				<!-- Menu Icon -->
 				<div class="flex lg:hidden">
@@ -176,11 +150,11 @@
 			>
 
 			<div class="mb-5 {$isAddTodoOpen ? 'block' : 'hidden'}">
-				<AddTodo data={data.addTodoForm} listArray={list} ownerId={data.profile?.id} />
+				<AddTodo data={addTodoForm} listArray={list} owner_id={profile?.id} />
 			</div>
 
 			{#if todo.length === 0}
-				<p class="rounded-lg border px-8 py-4 text-lg">No todos here. Hooray! 🎉</p>
+				<p class="rounded-lg border px-8 py-4 text-lg">No todos here. Add one now! 🎉</p>
 			{/if}
 
 			{#each todo as todoItem (todoItem.id)}

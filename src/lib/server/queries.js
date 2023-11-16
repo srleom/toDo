@@ -13,55 +13,69 @@ export async function loadUserProfile(id) {
  * This function inserts a new profile.
  * @param {Object} newProfile
  * @param {string} newProfile.username
- * @param {string} newProfile.userId
+ * @param {string} newProfile.user_id
  * @param {string | undefined} newProfile.email
  */
 export async function insertProfile(newProfile) {
 	const { data, error } = await supabase.from('profile').insert([newProfile]).select();
+	if (error) {
+		console.log(error);
+	}
 	return data;
 }
 
 /**
- * @param {number} ownerId
- * @param {string | null} listId
+ * @param {number} owner_id
+ * @param {string | null} list_id
  */
-export async function loadRequiredTodo(ownerId, listId) {
-	if (listId) {
+export async function loadRequiredTodo(owner_id, list_id) {
+	if (list_id) {
 		let { data: toDo, error } = await supabase
 			.from('toDo')
 			.select(`id, todo, due_date, completed, owner_id, list (id, list_name)`)
-			.eq('owner_id', ownerId)
-			.eq('list_id', listId)
+			.eq('owner_id', owner_id)
+			.eq('list_id', list_id)
 			.order('completed', { ascending: true });
+		if (error) {
+			console.log(error);
+		}
 		return toDo;
 	} else {
 		let { data: toDo, error } = await supabase
 			.from('toDo')
 			.select(`id, todo, due_date, completed, owner_id, list (id, list_name)`)
-			.eq('owner_id', ownerId)
-
+			.eq('owner_id', owner_id)
 			.order('completed', { ascending: true });
+		if (error) {
+			console.log(error);
+		}
 		return toDo;
 	}
 }
 
 /**
  * Gets specific List Id by name, if no id provided, gets all List Ids.
- * @param {number} ownerId
- * @param { string | null } listName
+ * @param {number} owner_id
+ * @param { string | null } list_name
  */
-export async function getListIdFromName(ownerId, listName) {
+export async function getListIdFromName(owner_id, list_name) {
 	let { data: list, error } = await supabase
 		.from('list')
 		.select('id')
-		.eq('owner_id', ownerId)
-		.eq('list_name', listName);
+		.eq('owner_id', owner_id)
+		.eq('list_name', list_name);
+	if (error) {
+		console.log(error);
+	}
 	return list;
 }
 
-/** @param {number} ownerId */
-export async function loadAllList(ownerId) {
-	let { data: list, error } = await supabase.from('list').select('*').eq('owner_id', ownerId);
+/** @param {number} owner_id */
+export async function loadAllList(owner_id) {
+	let { data: list, error } = await supabase.from('list').select('*').eq('owner_id', owner_id);
+	if (error) {
+		console.log(error);
+	}
 	return list;
 }
 
@@ -69,11 +83,14 @@ export async function loadAllList(ownerId) {
  * This is a function that inserts a new todo.
  * @param {Object} newTodo
  * @param {string} newTodo.todo
- * @param {string} newTodo.dueDate
- * @param {string} newTodo.listId
+ * @param {string} newTodo.due_date
+ * @param {string} newTodo.list_id
  */
 export async function insertTodo(newTodo) {
 	const { data, error } = await supabase.from('toDo').insert([newTodo]).select();
+	if (error) {
+		console.log(error);
+	}
 	return data;
 }
 
@@ -82,14 +99,6 @@ export async function insertTodo(newTodo) {
  * @param {Object} toBeCompletedTodo
  * @param {boolean} toBeCompletedTodo.completed
  * @param {string} toBeCompletedTodo.id
- * @returns {Promise<Array<{
- *   id: string,
- *   todo: string,
- *   list: string,
- *   completed: boolean,
- *   createdAt: Date,
- *   dueDate: Date
- * }>>}
  */
 export async function completeTodo(toBeCompletedTodo) {
 	const { data, error } = await supabase
@@ -97,6 +106,9 @@ export async function completeTodo(toBeCompletedTodo) {
 		.update({ completed: toBeCompletedTodo.completed })
 		.eq('id', toBeCompletedTodo.id)
 		.select();
+	if (error) {
+		console.log(error);
+	}
 	return data;
 }
 
@@ -107,26 +119,43 @@ export async function completeTodo(toBeCompletedTodo) {
 
 export async function deleteTodo(id) {
 	const { error } = await supabase.from('toDo').delete().eq('id', id);
+	if (error) {
+		console.log(error);
+	}
 }
 
 /**
  * This is a function that inserts a new todo.
  * @param {Object} newList
- * @param {string} newList.listName
+ * @param {string} newList.list_name
  */
 export async function insertList(newList) {
 	const { data, error } = await supabase.from('list').insert([newList]).select();
-
+	if (error) {
+		console.log(error);
+	}
 	return data;
 }
 
 /**
- * This is a function that deletes a todo.
- * @param {string} id
+ * This is a function that deletes a list.
+ * @param {number} owner_id
+ * @param {string} list_id
  */
 
-export async function deleteList(id) {
-	const { error } = await supabase.from('list').delete().eq('list_id', id);
+export async function deleteList(owner_id, list_id) {
+	const deletedListTodo = await loadRequiredTodo(owner_id, list_id);
+	const inboxListId = await getListIdFromName(owner_id, 'Inbox').then((data) => data[0].id);
 
+	const { data } = await supabase
+		.from('toDo')
+		.update({ list_id: inboxListId })
+		.eq('list_id', list_id)
+		.select();
+
+	const { error } = await supabase.from('list').delete().eq('id', list_id);
+	if (error) {
+		console.log(error);
+	}
 	return error;
 }

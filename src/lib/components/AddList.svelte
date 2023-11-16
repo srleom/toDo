@@ -1,15 +1,21 @@
 <script>
 	import { superForm } from 'sveltekit-superforms/client';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-	import { isAddListOpen } from '../../stores';
+	import { isAddListOpen } from '../stores';
 
 	export let data;
 
+	/** @type {number | undefined} */
+	export let ownerId;
+
 	const { form, errors, enhance } = superForm(data, {
 		resetForm: true,
+		warnings: {
+			duplicateId: false
+		},
 		onResult({ result }) {
 			if (result.type === 'success') {
-                isAddListOpen.set(false)
+				isAddListOpen.set(false);
 			}
 		}
 	});
@@ -17,6 +23,7 @@
 
 <!-- <SuperDebug data={$form} /> -->
 <form method="POST" action="?/addList" class="mt-5 flex flex-col items-start space-y-3" use:enhance>
+	<input type="hidden" name="ownerId" value={ownerId} />
 	<input
 		type="text"
 		name="listName"

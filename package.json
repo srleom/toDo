@@ -12,21 +12,13 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest",
-		"generate": "drizzle-kit generate:pg --config=drizzle.config.js",
-		"migrate": "node src/lib/server/migrate.js",
-		"introspect": "drizzle-kit introspect:pg",
-		"push": "drizzle-kit push:pg --config=drizzle.config.js",
-		"drop": "drizzle-kit drop",
-		"up": "drizzle-kit up:pg",
-		"drizzle-check": "drizzle-kit check:pg"
+		"test:unit": "vitest"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28.1",
-		"@sveltejs/adapter-auto": "next",
-		"@sveltejs/kit": "next",
+		"@sveltejs/adapter-auto": "^2.1.0",
+		"@sveltejs/kit": "^1.26.0",
 		"autoprefixer": "^10.4.16",
-		"drizzle-kit": "^0.19.13",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte": "^2.30.0",
@@ -46,9 +38,9 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@supabase/ssr": "^0.0.9",
 		"@supabase/supabase-js": "^2.38.2",
 		"dotenv": "^16.3.1",
-		"drizzle-orm": "^0.28.6",
 		"postgres": "^3.4.3",
 		"svelte-french-toast": "^1.2.0"
 	}

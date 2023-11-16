@@ -1,16 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
-
-	/**
-	 * @typedef {Object} List
-	 * @property {string} id - The ID of the object.
-	 * @property {string} listName - The task to be done.
-	 * @property {Date} createdAt - Created at.
-	 */
-
-	/**
-	 * @type {List[]}
-	 */
+	import { isSideBarOpen } from '$lib/stores';
 
 	export let listArray = [];
 
@@ -19,8 +9,10 @@
 
 <div class="mt-3">
 	<ul class=" flex flex-col text-lg">
-		<a href="/" data-sveltekit-preload-data>All lists</a>
-		{#each listArray as listItem, listId (listItem.id)}
+		<a href="/dashboard" data-sveltekit-preload-data on:click={() => isSideBarOpen.set(false)}
+			>All lists</a
+		>
+		{#each listArray as listItem (listItem.id)}
 			<div
 				role="presentation"
 				class="mb-1 flex items-center justify-between gap-3"
@@ -28,16 +20,17 @@
 				on:mouseleave={() => (showIcons = false)}
 			>
 				<a
-					href="/{listItem.listName.toLowerCase()}"
+					href="/dashboard?list={listItem.list_name}"
 					class="hover:text-blue"
-					data-sveltekit-preload-data>{listItem.listName}</a
+					data-sveltekit-preload-data
+					on:click={() => isSideBarOpen.set(false)}>{listItem.list_name}</a
 				>
 				<div class="flex gap-1 {showIcons ? 'block' : 'hidden'}">
 					<form action="?/deleteList" method="POST" use:enhance>
 						<input type="hidden" name="id" hidden value={listItem.id} />
 						<button>
 							<img
-								src="icons/bin.svg"
+								src="/icons/bin.svg"
 								alt="delete list"
 								class="h-4 cursor-pointer opacity-30 hover:opacity-100"
 							/>

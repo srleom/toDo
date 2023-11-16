@@ -1,22 +1,13 @@
 <script>
 	import { superForm } from 'sveltekit-superforms/client';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-	import { isAddTodoOpen } from '../../stores';
+	import { isAddTodoOpen } from '../stores';
+	import { onMount } from 'svelte';
 
 	export let data;
 
-	/**
-	 * @typedef {Object} List
-	 * @property {string} id - The ID of the object.
-	 * @property {string} listName - The task to be done.
-	 * @property {Date} createdAt - Created at.
-	 */
-
-	/**
-	 * An array of List objects.
-	 * @type {List[]}
-	 */
-	export let listArray = [];
+	/** @type {number | undefined} */
+	export let ownerId;
 
 	const { form, errors, enhance } = superForm(data, {
 		resetForm: true,
@@ -26,6 +17,28 @@
 			}
 		}
 	});
+
+	/**
+	 * @typedef {Object} List
+	 * @property {string} id - The ID of the object.
+	 * @property {string} listName - The task to be done.
+	 */
+
+	/**
+	 * An array of List objects.
+	 * @type {List[]}
+	 */
+	export let listArray = [];
+
+	let listId = '';
+	function selectListId() {
+		const selectedList = listArray.find((listArray) => listArray.listName === $form.list);
+		if (selectedList) {
+			listId = selectedList.id;
+		}
+	}
+
+	onMount(() => selectListId());
 </script>
 
 <!-- <SuperDebug data={$form} /> -->
@@ -39,6 +52,7 @@
 		<div class="flex items-start gap-6">
 			<div>
 				<input type="checkbox" class="mt-1 h-5 w-5" disabled />
+				<input type="hidden" name="ownerId" value={ownerId} />
 			</div>
 			<div class="flex flex-col space-y-3">
 				<input
@@ -66,12 +80,14 @@
 						id="list"
 						bind:value={$form.list}
 						class="rounded-lg border border-gray-300 px-2 text-sm focus:border-blue focus:outline-none"
+						on:change={selectListId}
 					>
-						{#each listArray as listItem, listId (listItem.id)}
+						{#each listArray as listItem (listItem.id)}
 							<option value={listItem.listName}>{listItem.listName}</option>
 						{/each}
 					</select>
 					{#if $errors.list}<span class="text-sm font-light">{$errors.list}</span>{/if}
+					<input type="hidden" name="listId" bind:value={listId} />
 				</div>
 			</div>
 		</div>

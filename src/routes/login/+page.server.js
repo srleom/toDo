@@ -1,6 +1,6 @@
 import { setError, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, redirect, error } from '@sveltejs/kit';
 import { AuthApiError } from '@supabase/supabase-js';
 
 const loginSchema = z.object({
@@ -48,17 +48,23 @@ export const actions = {
 		});
 
 		if (err) {
+			const errMessage = err.toString().slice(14);
 			if (err instanceof AuthApiError && err.status === 400) {
-				console.log(err);
-				const errMessage = err.toString().slice(14);
+				console.log('Auth error: ', err);
 				loginForm.data.password = '';
 				return setError(loginForm, 'password', `${errMessage}`);
 			}
-			loginForm.data.password = '';
-			return setError(loginForm, 'password', 'Server error. Please try again later.');
-		}
 
-		throw redirect(303, '/dashboard');
-		return { loginForm };
+			loginForm.data.password = '';
+			console.log('Server error: ', err);
+			return setError(
+				loginForm,
+				'password',
+				`Server error: ${errMessage}. Please try again later.`
+			);
+		} else {
+			throw redirect(301, '/dashboard')
+			return { loginForm };
+		}
 	}
 };

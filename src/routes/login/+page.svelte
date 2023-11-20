@@ -56,9 +56,9 @@
 					<label for="password" class="block text-sm font-medium leading-6 text-gray-900"
 						>Password</label
 					>
-					<!-- <div class="text-sm">
-						<a href="#" class="text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-					</div> -->
+					<a href="/forget-password" class="text-sm text-indigo-600 hover:text-indigo-500"
+						>Forgot password?</a
+					>
 				</div>
 				<div class="mt-2">
 					<input

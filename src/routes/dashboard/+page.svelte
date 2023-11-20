@@ -53,10 +53,10 @@
 			<div
 				class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
 			>
-				<div class="flex items-center justify-between">
+				<div class="flex items-center justify-between px-5">
 					<a href="/dashboard" class="-m-1.5 p-1.5" on:click={() => isSideBarOpen.set(false)}>
 						<span class="sr-only">toDo</span>
-						<img class="h-8 w-auto" src="/favicon.png" alt="" />
+						<a href="/"><img class="h-8 w-auto" src="/favicon.png" alt="toDo homepage" /></a>
 					</a>
 					<button
 						type="button"
@@ -76,7 +76,37 @@
 						</svg>
 					</button>
 				</div>
-				<div class="flow-root" />
+				<div class="flow-root">
+					<div class="border-b px-5 py-10">
+						<div>
+							<p class="font-mono text-xs">WELCOME BACK,</p>
+							<a href="/dashboard" class="text-2xl">{profile?.username}</a>
+						</div>
+					</div>
+
+					<div class="px-5 py-10">
+						<div class="flex justify-between">
+							<h2 class="mb-2 text-2xl font-medium">Lists</h2>
+							<button
+								class="relative mb-2 text-2xl transition ease-in-out hover:rotate-45 hover:scale-110 hover:text-blue hover:duration-100"
+								on:click={toggleAddList}>+</button
+							>
+						</div>
+						<List listArray={listDashboard} />
+
+						<div class="mb-5 {$isAddListOpen ? 'block' : 'hidden'}">
+							<AddList data={addListForm} owner_id={profile?.id} />
+						</div>
+
+						<form action="/auth/logout" method="POST">
+							<button
+								type="submit"
+								class="mt-4 rounded-lg border border-gray-500 px-1 py-0.5 font-mono text-xs"
+								>Logout</button
+							>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -88,7 +118,7 @@
 					<p class="font-mono text-xs">WELCOME BACK,</p>
 					<a href="/dashboard" class="text-2xl">{profile?.username}</a>
 				</div>
-				<form action="/logout" method="POST">
+				<form action="/auth/logout" method="POST">
 					<button
 						type="submit"
 						class="mt-4 rounded-lg border border-gray-500 px-1 py-0.5 font-mono text-xs"
@@ -113,7 +143,9 @@
 			</div>
 		</div>
 
+		<!-- Main todos dasboard -->
 		<div class="col-span-9 border-l px-10 py-10 sm:px-20 lg:col-span-7">
+			<!-- Header -->
 			<div class="flex justify-between">
 				<h2 class="text-2xl">{listQueried ? `Todos in ${listQueried}` : 'All todos'}</h2>
 

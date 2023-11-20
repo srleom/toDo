@@ -24,7 +24,6 @@
 		const selectedList = listArray.find((listArray) => listArray.list_name === $form.list_name);
 		if (selectedList) {
 			list_id = selectedList.id;
-			console.log(list_id);
 		}
 	}
 

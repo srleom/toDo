@@ -1,6 +1,5 @@
 <script>
 	import { superForm } from 'sveltekit-superforms/client';
-	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 	import { isAddListOpen } from '../stores';
 
 	export let data;
@@ -21,7 +20,6 @@
 	});
 </script>
 
-<!-- <SuperDebug data={$form} /> -->
 <form method="POST" action="?/addList" class="mt-5 flex flex-col items-start space-y-3" use:enhance>
 	<input type="hidden" name="owner_id" value={owner_id} />
 	<input

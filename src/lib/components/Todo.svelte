@@ -9,7 +9,6 @@
 	export let dueDate = '2023-11-06T00:00:00.000Z';
 	const date = new Date(dueDate);
 	const options = { year: 'numeric', month: 'short', day: 'numeric' };
-	// @ts-ignore
 	const formattedDueDate = date.toLocaleDateString('en-US', options);
 
 	// Hover delete effect

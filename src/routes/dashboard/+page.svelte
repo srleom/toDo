@@ -14,7 +14,37 @@
 
 	const { profile, addListForm, addTodoForm } = data;
 
+	/**
+	 * @typedef {Object} todo
+	 * @property {string} todo
+	 * @property {boolean} completed
+	 * @property {string} due_date
+	 * @property {string} id
+	 * @property {number} owner_id
+	 * @property {Object} list
+	 * @property {string} list.id
+	 * @property {string} list.list_name
+	 */
+
+	/**
+	 * An array of todo objects
+	 * @type {todo[]}
+	 */
+
 	$: todo = data.todo;
+
+	/**
+	 * @typedef {Object} listArray
+	 * @property {string} created_at
+	 * @property {string} id
+	 * @property {string} list_name
+	 * @property {number} owner_id
+	 */
+
+	/**
+	 * An array of list objects
+	 * @type {listArray[]}
+	 */
 	$: list = data.list;
 	$: listDashboard = data.listDashboard;
 	$: listQueried = data.listQueried;
@@ -29,9 +59,9 @@
 
 	$: if (form?.addTodoSuccess) {
 		toast.success('Todo added!');
-	} else if (form?.completeTodoSuccess && form?.completed) {
+	} else if (form?.completeTodoSuccess && form?.completed === 'on') {
 		toast.success('Todo completed!');
-	} else if (form?.completeTodoSuccess && !form?.completed) {
+	} else if (form?.completeTodoSuccess && form?.completed === 'off') {
 		toast.success('Todo un-completed!');
 	} else if (form?.deleteTodoSuccess) {
 		toast.success('Todo deleted!');
@@ -185,7 +215,7 @@
 				<AddTodo data={addTodoForm} listArray={list} owner_id={profile?.id} />
 			</div>
 
-			{#if todo.length === 0}
+			{#if todo?.length === 0}
 				<p class="rounded-lg border px-8 py-4 text-lg">No todos here. Add one now! 🎉</p>
 			{/if}
 

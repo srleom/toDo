@@ -63,7 +63,7 @@ export const actions = {
 		// Onboard user
 		const createInboxList = await insertList({
 			list_name: 'Inbox',
-			owner_id: insertedProfile[0].id
+			owner_id: insertedProfile?.[0].id
 		});
 
 		throw redirect(303, '/dashboard');

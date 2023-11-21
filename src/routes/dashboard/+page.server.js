@@ -55,13 +55,13 @@ export async function load({ url, locals: { getSession } }) {
 		throw redirect(301, '/profile');
 	}
 
-	const profile = profileData[0];
+	const profile = profileData?.[0];
 
 	// Search params
 	const listQueried = url.searchParams.get('list');
 	let listIdQueried = null;
 	if (listQueried) {
-		listIdQueried = await getListIdFromName(profile.id, listQueried).then((list) => list[0].id);
+		listIdQueried = await getListIdFromName(profile.id, listQueried).then((list) => list?.[0].id);
 	}
 
 	try {
@@ -104,31 +104,26 @@ export const actions = {
 			return fail(400, { addTodoForm });
 		}
 
-		delete addTodoForm.data.list_name;
-		const insertedTodo = await insertTodo(addTodoForm.data);
+		const { list_name, ...rest } = addTodoForm.data;
+		const addTodoData = rest;
+
+		const insertedTodo = await insertTodo(addTodoData);
 		return { addTodoSuccess: true, addTodoForm, insertedTodo };
 	},
 
 	completeTodo: async ({ request }) => {
 		const formData = await request.formData();
 		let completed = formData.get('completed');
-		if (completed === 'on') {
-			// @ts-ignore
-			completed = true;
-		} else if (completed === 'off') {
-			// @ts-ignore
-			completed = false;
-		}
 		const id = formData.get('id');
+
 		const completedTodo = { completed, id };
 
 		if (!completedTodo) {
 			return fail(400, { completedTodo });
 		}
 
-		// @ts-ignore
 		const updatedTodo = await completeTodo(completedTodo);
-		return { completeTodoSuccess: true, completed: updatedTodo[0].completed };
+		return { completeTodoSuccess: true, completed };
 	},
 
 	deleteTodo: async ({ request }) => {
@@ -139,7 +134,6 @@ export const actions = {
 			return fail(400, { id });
 		}
 
-		// @ts-ignore
 		const deletedTodo = await deleteTodo(id);
 		return { deleteTodoSuccess: true, deletedTodo };
 	},

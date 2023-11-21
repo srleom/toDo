@@ -85,6 +85,7 @@ export async function loadAllList(owner_id) {
  * @param {string} newTodo.todo
  * @param {string} newTodo.due_date
  * @param {string} newTodo.list_id
+ * @param {number} newTodo.owner_id
  */
 export async function insertTodo(newTodo) {
 	const { data, error } = await supabase.from('toDo').insert([newTodo]).select();
@@ -97,7 +98,7 @@ export async function insertTodo(newTodo) {
 /**
  * This is a function that updated when a todo is completed.
  * @param {Object} toBeCompletedTodo
- * @param {boolean} toBeCompletedTodo.completed
+ * @param {string} toBeCompletedTodo.completed
  * @param {string} toBeCompletedTodo.id
  */
 export async function completeTodo(toBeCompletedTodo) {
@@ -128,6 +129,7 @@ export async function deleteTodo(id) {
  * This is a function that inserts a new todo.
  * @param {Object} newList
  * @param {string} newList.list_name
+ * @param {number} newList.owner_id
  */
 export async function insertList(newList) {
 	const { data, error } = await supabase.from('list').insert([newList]).select();
@@ -145,7 +147,11 @@ export async function insertList(newList) {
 
 export async function deleteList(owner_id, list_id) {
 	const deletedListTodo = await loadRequiredTodo(owner_id, list_id);
-	const inboxListId = await getListIdFromName(owner_id, 'Inbox').then((data) => data[0].id);
+	const inboxListId = await getListIdFromName(owner_id, 'Inbox').then((data) => {
+		if (data) {
+			data[0].id;
+		}
+	});
 
 	const { data } = await supabase
 		.from('toDo')

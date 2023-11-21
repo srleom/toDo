@@ -5,6 +5,7 @@ export const GET = async (event) => {
 		url,
 		locals: { supabase }
 	} = event;
+
 	const token_hash = url.searchParams.get('token_hash');
 	const type = url.searchParams.get('type');
 	const next = url.searchParams.get('next') ?? '/';

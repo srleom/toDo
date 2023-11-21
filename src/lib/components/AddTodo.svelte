@@ -1,6 +1,5 @@
 <script>
 	import { superForm } from 'sveltekit-superforms/client';
-	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 	import { isAddTodoOpen } from '../stores';
 
 	export let data;
@@ -17,6 +16,19 @@
 		}
 	});
 
+	/**
+	 * @typedef {Object} listArray
+	 * @property {string} created_at
+	 * @property {string} id
+	 * @property {string} list_name
+	 * @property {number} owner_id
+	 */
+
+	/**
+	 * An array of list objects
+	 * @type {listArray[]}
+	 */
+
 	export let listArray = [];
 
 	let list_id = '';
@@ -32,7 +44,6 @@
 	}
 </script>
 
-<!-- <SuperDebug data={$form} /> -->
 <div class="rounded-lg border border-gray-500 px-8 py-4 focus-within:border-blue">
 	<form
 		method="POST"

@@ -2,6 +2,19 @@
 	import { enhance } from '$app/forms';
 	import { isSideBarOpen } from '$lib/stores';
 
+	/**
+	 * @typedef {Object} listArray
+	 * @property {string} created_at
+	 * @property {string} id
+	 * @property {string} list_name
+	 * @property {number} owner_id
+	 */
+
+	/**
+	 * An array of list objects
+	 * @type {listArray[]}
+	 */
+
 	export let listArray = [];
 
 	let showBinIcon = false;

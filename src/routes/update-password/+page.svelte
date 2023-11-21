@@ -35,7 +35,7 @@
 			<img class="mx-auto h-10 w-auto" src="/favicon.png" alt="Your Company" />
 		</a>
 
-		<h2 class="mt-10 text-center text-2xl font-medium leading-9 tracking-tight text-gray-900">
+		<h2 class="mt-5 text-center text-2xl font-medium leading-9 tracking-tight text-gray-900">
 			Reset your password
 		</h2>
 	</div>
@@ -76,7 +76,10 @@
 
 				{#if form?.passwordUpdated}
 					<p class="mt-4 text-center text-sm text-indigo-600">
-						Your password has been updated. Return to the dashboard <a href="/dashboard" class='underline'>here</a>.
+						Your password has been updated. Return to the dashboard <a
+							href="/dashboard"
+							class="underline">here</a
+						>.
 					</p>
 				{/if}
 			</div>

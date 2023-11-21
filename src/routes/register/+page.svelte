@@ -34,7 +34,7 @@
 			<img class="mx-auto h-10 w-auto" src="/favicon.png" alt="Your Company" />
 		</a>
 
-		<h2 class="mt-10 text-center text-2xl font-medium leading-9 tracking-tight text-gray-900">
+		<h2 class="mt-5 text-center text-2xl font-medium leading-9 tracking-tight text-gray-900">
 			Register
 		</h2>
 	</div>

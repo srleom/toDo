@@ -1,5 +1,9 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { combineChunks, createBrowserClient, isBrowser, parse } from '@supabase/ssr';
+import { dev } from '$app/environment';
+import { inject } from '@vercel/analytics';
+
+inject({ mode: dev ? 'development' : 'production' });
 
 /** @type {import('./$types').LayoutLoad} */
 export const load = async ({ fetch, data, depends }) => {

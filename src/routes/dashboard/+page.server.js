@@ -54,7 +54,7 @@ export async function load({ url, locals: { getSession } }) {
 	if (profileData?.length === 0) {
 		throw redirect(301, '/profile');
 	}
-
+	
 	const profile = profileData?.[0];
 
 	// Search params
@@ -166,6 +166,5 @@ export const actions = {
 
 		const deletedList = await deleteList(owner_id, list_id);
 		return { deleteListSuccess: true, deletedList };
-		throw redirect(301, '/dashboard');
 	}
 };

@@ -5,6 +5,7 @@
 	import AddList from '$lib/components/AddList.svelte';
 	import { isAddTodoOpen, isAddListOpen, isSideBarOpen } from '../../lib/stores';
 	import toast, { Toaster } from 'svelte-french-toast';
+	import { goto } from '$app/navigation';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -45,6 +46,7 @@
 	 * An array of list objects
 	 * @type {listArray[]}
 	 */
+
 	$: list = data.list;
 	$: listDashboard = data.listDashboard;
 	$: listQueried = data.listQueried;

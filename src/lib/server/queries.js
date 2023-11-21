@@ -1,12 +1,14 @@
 import { supabase } from './supabaseClient';
 
-/** @param {string} id */
+/** @param {string} id
+ */
 export async function loadUserProfile(id) {
-	let { data: profile, error } = await supabase.from('profile').select('*').eq('user_id', id);
+	let { data, error } = await supabase.from('profile').select('*').eq('user_id', id);
 	if (error) {
 		console.log(error);
+		return error;
 	}
-	return profile;
+	return data;
 }
 
 /**
@@ -20,6 +22,7 @@ export async function insertProfile(newProfile) {
 	const { data, error } = await supabase.from('profile').insert([newProfile]).select();
 	if (error) {
 		console.log(error);
+		return error;
 	}
 	return data;
 }
@@ -30,7 +33,7 @@ export async function insertProfile(newProfile) {
  */
 export async function loadRequiredTodo(owner_id, list_id) {
 	if (list_id) {
-		let { data: toDo, error } = await supabase
+		let { data, error } = await supabase
 			.from('toDo')
 			.select(`id, todo, due_date, completed, owner_id, list (id, list_name)`)
 			.eq('owner_id', owner_id)
@@ -38,18 +41,20 @@ export async function loadRequiredTodo(owner_id, list_id) {
 			.order('completed', { ascending: true });
 		if (error) {
 			console.log(error);
+			return error;
 		}
-		return toDo;
+		return data;
 	} else {
-		let { data: toDo, error } = await supabase
+		let { data, error } = await supabase
 			.from('toDo')
 			.select(`id, todo, due_date, completed, owner_id, list (id, list_name)`)
 			.eq('owner_id', owner_id)
 			.order('completed', { ascending: true });
 		if (error) {
 			console.log(error);
+			return error;
 		}
-		return toDo;
+		return data;
 	}
 }
 
@@ -59,24 +64,26 @@ export async function loadRequiredTodo(owner_id, list_id) {
  * @param { string | null } list_name
  */
 export async function getListIdFromName(owner_id, list_name) {
-	let { data: list, error } = await supabase
+	let { data, error } = await supabase
 		.from('list')
 		.select('id')
 		.eq('owner_id', owner_id)
 		.eq('list_name', list_name);
 	if (error) {
 		console.log(error);
+		return error;
 	}
-	return list;
+	return data;
 }
 
 /** @param {number} owner_id */
 export async function loadAllList(owner_id) {
-	let { data: list, error } = await supabase.from('list').select('*').eq('owner_id', owner_id);
+	let { data, error } = await supabase.from('list').select('*').eq('owner_id', owner_id);
 	if (error) {
 		console.log(error);
+		return error;
 	}
-	return list;
+	return data;
 }
 
 /**
@@ -91,6 +98,7 @@ export async function insertTodo(newTodo) {
 	const { data, error } = await supabase.from('toDo').insert([newTodo]).select();
 	if (error) {
 		console.log(error);
+		return error;
 	}
 	return data;
 }
@@ -109,6 +117,7 @@ export async function completeTodo(toBeCompletedTodo) {
 		.select();
 	if (error) {
 		console.log(error);
+		return error;
 	}
 	return data;
 }
@@ -122,7 +131,9 @@ export async function deleteTodo(id) {
 	const { error } = await supabase.from('toDo').delete().eq('id', id);
 	if (error) {
 		console.log(error);
+		return error;
 	}
+	return { success: true };
 }
 
 /**
@@ -135,6 +146,7 @@ export async function insertList(newList) {
 	const { data, error } = await supabase.from('list').insert([newList]).select();
 	if (error) {
 		console.log(error);
+		return error;
 	}
 	return data;
 }
@@ -147,21 +159,25 @@ export async function insertList(newList) {
 
 export async function deleteList(owner_id, list_id) {
 	const deletedListTodo = await loadRequiredTodo(owner_id, list_id);
-	const inboxListId = await getListIdFromName(owner_id, 'Inbox').then((data) => {
-		if (data) {
-			data[0].id;
-		}
-	});
+	const inboxListIdData = await getListIdFromName(owner_id, 'Inbox');
+	const inboxListId = inboxListIdData?.[0].id;
 
-	const { data } = await supabase
+	const { data, error: updateListError } = await supabase
 		.from('toDo')
 		.update({ list_id: inboxListId })
 		.eq('list_id', list_id)
 		.select();
 
+	if (updateListError) {
+		console.log(updateListError);
+		return updateListError;
+	}
+
 	const { error } = await supabase.from('list').delete().eq('id', list_id);
 	if (error) {
 		console.log(error);
+		return error;
 	}
-	return error;
+
+	return { success: true };
 }

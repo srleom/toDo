@@ -61,7 +61,12 @@ export async function load({ url, locals: { getSession } }) {
 	const listQueried = url.searchParams.get('list');
 	let listIdQueried = null;
 	if (listQueried) {
-		listIdQueried = await getListIdFromName(profile.id, listQueried).then((list) => list?.[0].id);
+		const listIdQueriedData = await getListIdFromName(profile.id, listQueried);
+		if (listIdQueriedData?.length > 0) {
+			listIdQueried = listIdQueriedData[0].id;
+		} else if (listIdQueriedData?.length === 0) {
+			throw redirect(301, "/dashboard")
+		}
 	}
 
 	try {
@@ -86,6 +91,7 @@ export async function load({ url, locals: { getSession } }) {
 		};
 	} catch (e) {
 		// Handle any potential errors here
+		console.log(e);
 		return {
 			error: e
 		};
@@ -159,7 +165,7 @@ export const actions = {
 		}
 
 		const deletedList = await deleteList(owner_id, list_id);
-		throw redirect(301, '/dashboard');
 		return { deleteListSuccess: true, deletedList };
+		throw redirect(301, '/dashboard');
 	}
 };

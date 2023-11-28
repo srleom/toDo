@@ -1,3 +1,4 @@
 # toDo
 
-A simple toDo app with authentication functionality. Built with SvelteKit, TailwindCSS and Supabase.
+A simple toDo app with authentication functionality. 
+Built with SvelteKit, TailwindCSS, Superforms and Supabase.

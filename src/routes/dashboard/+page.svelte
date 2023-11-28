@@ -5,7 +5,6 @@
 	import AddList from '$lib/components/AddList.svelte';
 	import { isAddTodoOpen, isAddListOpen, isSideBarOpen } from '../../lib/stores';
 	import toast, { Toaster } from 'svelte-french-toast';
-	import { goto } from '$app/navigation';
 
 	/** @type {import('./$types').PageData} */
 	export let data;

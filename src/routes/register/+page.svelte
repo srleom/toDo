@@ -96,7 +96,7 @@
 				{#if form?.newUserRegistered}
 					<p class="mt-4 text-center text-sm text-indigo-600">
 						Thank you for registering, please check your <span class="font-medium">email</span> for the
-						confirmation link.
+						confirmation link. You may now close this tab.
 					</p>
 				{/if}
 			</div>

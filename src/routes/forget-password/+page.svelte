@@ -71,7 +71,8 @@
 
 				{#if form?.resetPasswordEmailSent}
 					<p class="mt-4 text-center text-sm text-indigo-600">
-						Please check your email for a link to reset your password.
+						Please check your email for a link to reset your password. You may now close this
+						tab.
 					</p>
 				{/if}
 			</div>

@@ -19,7 +19,7 @@
 </script>
 
 <div
-	class="mb-5 flex items-start space-x-6 rounded-lg border px-8 py-4"
+	class="mb-5 flex items-start space-x-4 rounded-lg border px-6 py-4 xs:space-x-6 sm:px-8"
 	on:mouseenter={() => (showBin = true)}
 	on:mouseleave={() => (showBin = false)}
 	role="presentation"

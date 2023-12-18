@@ -14,7 +14,7 @@
 		>.
 	</h2>
 	<h2>By SRLEOM.</h2>
-	<div class="mt-6 flex flex-col sm:flex-row sm:space-x-5">
+	<div class="mt-6 flex flex-col items-start space-y-1.5 sm:flex-row sm:space-x-5 sm:space-y-0">
 		<a
 			href="/login"
 			class="rounded-lg border border-gray-500 px-2.5 py-0.5"

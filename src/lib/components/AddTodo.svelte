@@ -48,10 +48,10 @@
 	<form
 		method="POST"
 		action="?/addTodo"
-		class="flex flex-col items-start justify-between space-x-4 xs:space-x-6 sm:flex-row sm:items-end"
+		class="flex flex-col items-start justify-between sm:flex-row sm:items-end"
 		use:enhance
 	>
-		<div class="flex items-start gap-6">
+		<div class="flex items-start space-x-4 xs:space-x-6">
 			<div>
 				<input type="checkbox" class="mt-1 h-5 w-5" disabled />
 				<input type="hidden" name="owner_id" value={owner_id} />
